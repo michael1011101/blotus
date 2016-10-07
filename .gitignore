@@ -15,6 +15,9 @@
 # Ignore server files
 /server
 
+# Ignore setting file
+/core/settings.py
+
 # Ignore migrations data files
 /stalk/migrations/data
 
