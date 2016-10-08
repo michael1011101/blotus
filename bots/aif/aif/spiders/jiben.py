@@ -2,6 +2,7 @@ import scrapy, json
 from utils.webpage import log_empty_fields, get_url_param
 from utils.exporter import read_cache
 from utils.hmacsha1 import get_unix_time, get_access_signature
+from utils.datetime import get_date_list
 from aif.items import JibenItem
 
 #################################################################################################
@@ -18,12 +19,12 @@ class JibenSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, need_token='0', formated_url='', password=None, date=None, *args, **kwargs):
+    def __init__(self, plat_id=None, need_token='0', formated_url='', password=None, from_date=None, to_date=None, *args, **kwargs):
         self.plat_id = plat_id
         self.need_token = bool(int(need_token))
         self.start_formated_url = formated_url
         self.password = password
-        self.date = date
+        self.from_date, self.to_date = from_date, to_date
 
         super(JibenSpider, self).__init__(*args, **kwargs)
 
@@ -37,15 +38,15 @@ class JibenSpider(scrapy.Spider):
             timestamp = get_unix_time()
             signature = get_access_signature(token, timestamp, self.password)
 
-            body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'date': self.date}
-
-            yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+            for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
+                body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'date': date}
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
         else:
-            body = {'date': self.date}
+            for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
+                body = {'date': date}
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
 
-            yield scrapy.FormRequest(self.start_formated_url, formdata=body)
         #url = self.start_formated_url.format(token=token)
-
         #yield self.make_requests_from_url(url)
 
     def parse(self, response):
