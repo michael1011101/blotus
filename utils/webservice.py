@@ -40,11 +40,12 @@ class ListDBJobs(WsResource):
 
     def render_GET(self, txrequest):
         project = txrequest.args['project'][0]
+        spider = txrequest.args['spider'][0]
         page_id = int(txrequest.args['page_id'][0])
         page_count = int(txrequest.args['page_count'][0])
 
         check_db_connection()
-        cnt, qs = JobItem.get_jobs_by_project(project, page_id, page_count)
+        cnt, qs = JobItem.get_jobs_by_project(project, spider, page_id, page_count)
         finished = [{'id': j.job_id, 'spider': j.spider, 'start_time': j.start_time.isoformat(' '),
                      'end_time': j.end_time.isoformat(' ')} for j in qs]
         return {"node_name": self.root.nodename, "status":"ok", "count": cnt, "finished": finished}

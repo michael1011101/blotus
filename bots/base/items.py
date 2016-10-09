@@ -85,12 +85,20 @@ class JobItem(BaseItem):
     unique_key = ('job_id', 'project', 'spider')
 
     @classmethod
-    def get_jobs_by_project(cls, project=None, page_id=1, page_count=20):
-        if not project: return 0, []
-
+    def get_jobs_by_project(cls, project=None, spider=None, page_id=1, page_count=20):
+        if not project and not spider:
+            anchor = (page_id - 1) * page_count
+            count = cls.django_model.objects.all().count()
+            query_set = cls.django_model.objects.all().order_by('-end_time')[anchor:anchor + page_count]
+            return count, query_set
+        if not spider:
+            anchor = (page_id - 1) * page_count
+            count = cls.django_model.objects.filter(project=project).count()
+            query_set = cls.django_model.objects.filter(project=project).order_by('-end_time')[anchor:anchor + page_count]
+            return count, query_set
         anchor = (page_id-1) * page_count
-        count = cls.django_model.objects.filter(project=project).count()
-        query_set = cls.django_model.objects.filter(project=project).order_by('-end_time')[anchor:anchor+page_count]
+        count = cls.django_model.objects.filter(project=project).filter(spider=spider).count()
+        query_set = cls.django_model.objects.filter(project=project).filter(spider=spider).order_by('-end_time')[anchor:anchor+page_count]
 
         return count, query_set
 
