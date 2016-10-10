@@ -51,7 +51,10 @@ class MeiriSpider(scrapy.Spider):
                 yield scrapy.FormRequest(self.start_formated_url, formdata=body)
 
     def parse(self, response):
-        symbol = (self.plat_id, get_url_param(response.request.body, 'from_date'), get_url_param(response.request.body, 'to_date'), response.url)
+        if self.method:
+            symbol = (self.plat_id, get_url_param(response.url, 'from_date'), get_url_param(response.url, 'to_date'), response.url)
+        else:
+            symbol = (self.plat_id, get_url_param(response.request.body, 'from_date'), get_url_param(response.request.body, 'to_date'), response.url)
         self.logger.info('Parsing No.%s Plat [%s, %s] Daily Data From <%s>.' % symbol)
 
         try:
@@ -60,7 +63,7 @@ class MeiriSpider(scrapy.Spider):
             if int(content.get('result_code', -1)) != 1 or not internal_content:
                 raise ValueError
         except Exception:
-            self.logger.warning('Fail To Receive No.%s Plat Basic Data From <%s>.' % symbol)
+            self.logger.warning('Fail To Receive No.%s Plat [%s, %s] Daily Data From <%s>.' % symbol)
             return None
 
         item_list = []

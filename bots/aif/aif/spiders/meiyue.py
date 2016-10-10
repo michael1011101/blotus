@@ -42,7 +42,10 @@ class MeiyueSpider(scrapy.Spider):
     def parse(self, response):
         #symbol = (self.plat_id, get_url_param(response.url, 'from_month'), get_url_param(response.url, 'to_month'), response.url)
         #self.logger.info('Parsing No.%s Plat [%s, %s] Monthly Data From <%s>.' % symbol)
-        symbol = (self.plat_id, get_url_param(response.request.body, 'month'), response.url)
+        if self.method:
+            symbol = (self.plat_id, get_url_param(response.url, 'month'), response.url)
+        else:
+            symbol = (self.plat_id, get_url_param(response.request.body, 'month'), response.url)
         self.logger.info('Parsing No.%s Plat %s Monthly Data From <%s>.' % symbol)
 
         try:
@@ -51,7 +54,7 @@ class MeiyueSpider(scrapy.Spider):
             if int(content.get('result_code', -1)) != 1 or not internal_content:
                 raise ValueError
         except Exception:
-            self.logger.warning('Fail To Receive No.%s Plat Basic Data From <%s>' % symbol)
+            self.logger.warning('Fail To Receive No.%s Plat %s Monthly Data From <%s>' % symbol)
 
         item = MeiyueItem()
         item['plat_id'] = self.plat_id
