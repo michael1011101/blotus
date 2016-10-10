@@ -19,8 +19,9 @@ class JibenSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, need_token='0', formated_url='', password=None, from_date=None, to_date=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date=None, to_date=None, *args, **kwargs):
         self.plat_id = plat_id
+        self.method = bool(int(method))
         self.need_token = bool(int(need_token))
         self.start_formated_url = formated_url
         self.password = password
@@ -42,12 +43,13 @@ class JibenSpider(scrapy.Spider):
                 body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'date': date}
                 yield scrapy.FormRequest(self.start_formated_url, formdata=body)
         else:
-            for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
-                body = {'date': date}
-                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
-
-        #url = self.start_formated_url.format(token=token)
-        #yield self.make_requests_from_url(url)
+            if self.method:
+                for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
+                    yield scrapy.FormRequest(self.start_formated_url.format(date=date), method='GET')
+            else:
+                for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
+                    body = {'date': date}
+                    yield scrapy.FormRequest(self.start_formated_url, formdata=body)
 
     def parse(self, response):
         symbol = (self.plat_id, response.url)

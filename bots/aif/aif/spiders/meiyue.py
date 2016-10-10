@@ -10,8 +10,9 @@ class MeiyueSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, need_token='0', formated_url='', password=None, month=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month=None, *args, **kwargs):
         self.plat_id = plat_id
+        self.method = bool(int(method))
         self.need_token = bool(int(need_token))
         self.start_formated_url = formated_url
         self.password = password
@@ -32,11 +33,11 @@ class MeiyueSpider(scrapy.Spider):
 
             yield scrapy.FormRequest(self.start_formated_url, formdata=body)
         else:
-            body = {'month':self.month}
-            yield scrapy.FormRequest(self.start_formated_url, formdata=body)
-
-        #url = self.start_formated_url.format(token=token)
-        #yield self.make_requests_from_url(url)
+            if self.method:
+                yield scrapy.FormRequest(self.start_formated_url.format(month=self.month), method='GET')
+            else:
+                body = {'month':self.month}
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
 
     def parse(self, response):
         #symbol = (self.plat_id, get_url_param(response.url, 'from_month'), get_url_param(response.url, 'to_month'), response.url)
