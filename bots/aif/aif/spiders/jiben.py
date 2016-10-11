@@ -45,15 +45,18 @@ class JibenSpider(scrapy.Spider):
         else:
             if self.method:
                 for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
-                    yield scrapy.FormRequest(self.start_formated_url.format(date=date), method='GET')
+                    yield scrapy.FormRequest(self.start_formated_url.format(date=date), method='GET', dont_filter=True)
             else:
                 for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
                     body = {'date': date}
                     yield scrapy.FormRequest(self.start_formated_url, formdata=body)
 
     def parse(self, response):
-        symbol = (self.plat_id, response.url)
-        self.logger.info('Parsing No.%s Plat Basic Data From <%s>.' % symbol)
+        if self.method:
+            symbol = (self.plat_id, get_url_param(response.url, 'date'), response.url)
+        else:
+            symbol = (self.plat_id, get_url_param(response.request.body, 'date'), response.url)
+        self.logger.info('Parsing No.%s Plat %s Basic Data From <%s>.' % symbol)
 
         try:
             content = json.loads(response.body_as_unicode())
@@ -61,12 +64,12 @@ class JibenSpider(scrapy.Spider):
             if int(content.get('result_code', -1)) != 1 or not internal_content:
                 raise ValueError
         except Exception:
-            self.logger.warning('Fail To Receive No.%s Plat Basic Data From <%s>.' % symbol)
+            self.logger.warning('Fail To Receive No.%s Plat %s Basic Data From <%s>.' % symbol)
             return None
 
         item = JibenItem()
         item['plat_id'] = self.plat_id
-        item['date'] = get_url_param(response.request.body, 'date')
+        item['date'] = symbol[1]
         item['turnover_amount'] = internal_content.get('turnover_amount')
         item['unconventional_turnover_amount'] = internal_content.get('unconventional_turnover_amount')
         item['trade_amount'] = internal_content.get('trade_amount')

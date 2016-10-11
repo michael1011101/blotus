@@ -15,6 +15,7 @@ class MeiriSpider(scrapy.Spider):
     name = 'meiri'
     allowed_domains = ['zwgt.com', 'order.ddsoucai.com']
     start_formated_url = None
+    formated_parameters = '?page_size={page_size}&page_index={page_index}&from_date={from_date}&to_date={to_date}'
     pipeline = ['UniqueItemPersistencePipeline']
 
     def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='2016-09-27', to_date='2016-09-28', page_size=20, page_index=1, *args, **kwargs):
@@ -45,7 +46,7 @@ class MeiriSpider(scrapy.Spider):
             yield scrapy.FormRequest(self.start_formated_url, formdata=body)
         else:
             if self.method:
-                yield scrapy.FormRequest(self.start_formated_url.format(page_size=self.page_size, page_index=self.page_index, from_date=self.from_date, to_date=self.to_date), method='GET')
+                yield scrapy.FormRequest(self.start_formated_url+self.formated_parameters.format(page_size=self.page_size, page_index=self.page_index, from_date=self.from_date, to_date=self.to_date), method='GET', dont_filter=True)
             else:
                 body = {'from_date': self.from_date,'to_date': self.to_date, 'page_size': self.page_size, 'page_index': self.page_index}
                 yield scrapy.FormRequest(self.start_formated_url, formdata=body)

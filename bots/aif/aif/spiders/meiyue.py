@@ -34,7 +34,7 @@ class MeiyueSpider(scrapy.Spider):
             yield scrapy.FormRequest(self.start_formated_url, formdata=body)
         else:
             if self.method:
-                yield scrapy.FormRequest(self.start_formated_url.format(month=self.month), method='GET')
+                yield scrapy.FormRequest(self.start_formated_url.format(month=self.month), method='GET', dont_filter=True)
             else:
                 body = {'month':self.month}
                 yield scrapy.FormRequest(self.start_formated_url, formdata=body)
@@ -50,15 +50,16 @@ class MeiyueSpider(scrapy.Spider):
 
         try:
             content = json.loads(response.body_as_unicode())
-            internal_content = content.get('data', {})[0]
+            internal_content = content.get('data', {})[0] if content.get('data', {})[0] else content.get('data', {})
             if int(content.get('result_code', -1)) != 1 or not internal_content:
                 raise ValueError
         except Exception:
             self.logger.warning('Fail To Receive No.%s Plat %s Monthly Data From <%s>' % symbol)
+            return None
 
         item = MeiyueItem()
         item['plat_id'] = self.plat_id
-        item['date'] = get_url_param(response.request.body, 'month')
+        item['date'] = symbol[1]
         item['loan_amount_per_capita'] = internal_content.get('loan_amount_per_capita')
         item['avg_loan_per_trade'] = internal_content.get('avg_loan_per_trade')
         item['invest_amount_per_capita'] = internal_content.get('invest_amount_per_capita')
