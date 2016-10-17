@@ -46,6 +46,6 @@ class ListDBJobs(WsResource):
 
         check_db_connection()
         cnt, qs = JobItem.get_jobs_by_project(project, spider, page_id, page_count)
-        finished = [{'id': j.job_id, 'spider': j.spider, 'start_time': j.start_time.isoformat(' '),
+        finished = [{'id': j.job_id, 'project': j.project, 'spider': j.spider, 'start_time': j.start_time.isoformat(' '),
                      'end_time': j.end_time.isoformat(' ')} for j in qs]
         return {"node_name": self.root.nodename, "status":"ok", "count": cnt, "finished": finished}
