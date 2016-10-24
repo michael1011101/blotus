@@ -50,6 +50,7 @@ class MeiyueSpider(scrapy.Spider):
 
         try:
             content = json.loads(response.body_as_unicode())
+            self.logger.info(content)
             internal_content = content.get('data', {})[0] if content.get('data', {})[0] else content.get('data', {})
             if int(content.get('result_code', -1)) != 1 or not internal_content:
                 raise ValueError

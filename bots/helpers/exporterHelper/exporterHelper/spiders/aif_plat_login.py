@@ -29,7 +29,10 @@ class AIFPlatLoginSpider(scrapy.Spider):
         if self.login_url:
             timestamp = get_unix_time()
             signature = get_login_signature(self.username, self.password, timestamp, self.secret_key)
-            body = {'username':self.username, 'timestamp':timestamp, 'signature':signature}
+            if self.secret_key:
+                body = {'username':self.username, 'password':self.password, 'timestamp':timestamp, 'signature':signature.upper()}
+            else:
+                body = {'username':self.username, 'timestamp':timestamp, 'signature':signature}
 
             yield scrapy.FormRequest(self.login_url, formdata=body)
 
@@ -40,6 +43,7 @@ class AIFPlatLoginSpider(scrapy.Spider):
         try:
             content = json.loads(response.body_as_unicode())
             #content = {'result': '1', 'data': {'token': 'yamiedie'}}
+            self.logger.info(content)
             if int(content.get('result', 0)) != 1:
                 raise ValueError
         except Exception:
