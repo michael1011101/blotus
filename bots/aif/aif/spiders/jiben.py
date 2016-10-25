@@ -41,7 +41,7 @@ class JibenSpider(scrapy.Spider):
 
             for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
                 body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'date': date}
-                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
             if self.method:
                 for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
@@ -49,7 +49,7 @@ class JibenSpider(scrapy.Spider):
             else:
                 for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
                     body = {'date': date}
-                    yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+                    yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):
         if self.method:

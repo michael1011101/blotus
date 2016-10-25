@@ -44,13 +44,13 @@ class MeiriSpider(scrapy.Spider):
 
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'from_date': self.from_date, 'to_date': self.to_date, 'page_size': self.page_size, 'page_index': self.page_index}
 
-            yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+            yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
             if self.method:
                 yield scrapy.FormRequest(self.start_formated_url+self.formated_parameters.format(page_size=self.page_size, page_index=self.page_index, from_date=self.from_date, to_date=self.to_date), method='GET', dont_filter=True)
             else:
                 body = {'from_date': self.from_date,'to_date': self.to_date, 'page_size': self.page_size, 'page_index': self.page_index}
-                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):
         if self.method:

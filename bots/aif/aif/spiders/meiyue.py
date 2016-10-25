@@ -31,13 +31,13 @@ class MeiyueSpider(scrapy.Spider):
             signature = get_access_signature(token, timestamp, self.password)
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'month': self.month}
 
-            yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+            yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
             if self.method:
                 yield scrapy.FormRequest(self.start_formated_url.format(month=self.month), method='GET', dont_filter=True)
             else:
                 body = {'month':self.month}
-                yield scrapy.FormRequest(self.start_formated_url, formdata=body)
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):
         #symbol = (self.plat_id, get_url_param(response.url, 'from_month'), get_url_param(response.url, 'to_month'), response.url)
