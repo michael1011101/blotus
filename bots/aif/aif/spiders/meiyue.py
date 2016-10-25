@@ -10,13 +10,13 @@ class MeiyueSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month='201609', *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
         self.start_formated_url = formated_url
         self.password = password
-        self.month = month
+        self.month = '-'.join(map('{:0>2}'.format, map(int, (month[:4], month[4:6]))))
 
         super(MeiyueSpider, self).__init__(*args, **kwargs)
 

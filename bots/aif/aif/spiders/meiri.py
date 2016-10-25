@@ -2,6 +2,7 @@ import scrapy, json
 from utils.webpage import log_empty_fields, get_url_param
 from utils.exporter import read_cache
 from utils.hmacsha1 import get_unix_time, get_access_signature
+from utils.datetime import encode_date, decode_date
 from aif.items import MeiriItem
 
 ############################################################################################################################
@@ -18,14 +19,14 @@ class MeiriSpider(scrapy.Spider):
     formated_parameters = '?page_size={page_size}&page_index={page_index}&from_date={from_date}&to_date={to_date}'
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='2016-09-27', to_date='2016-09-28', page_size=20, page_index=1, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20160927', to_date='20160928', page_size=20, page_index=1, *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
         self.start_formated_url = formated_url
         self.password = password
-        self.from_date = from_date
-        self.to_date = to_date
+        self.from_date = encode_date(decode_date(from_date), '-')
+        self.to_date = encode_date(decode_date(to_date), '-')
         self.page_size = str(page_size)
         self.page_index = str(page_index)
 

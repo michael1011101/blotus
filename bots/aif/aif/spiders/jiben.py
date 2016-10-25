@@ -19,7 +19,7 @@ class JibenSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date=None, to_date=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20161008', to_date='20161008', *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
