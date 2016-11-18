@@ -64,7 +64,10 @@ class JibenSpider(scrapy.Spider):
         if self.method:
             symbol = (self.plat_id, get_url_param(response.url, 'date'), response.url)
         else:
-            symbol = (self.plat_id, get_url_param(response.request.body, 'date'), response.url)
+            if self.is_json:
+                symbol = (self.plat_id, json.loads(response.request.body)['date'], response.url)
+            else:
+                symbol = (self.plat_id, get_url_param(response.request.body, 'date'), response.url)
         self.logger.info('Parsing No.%s Plat %s Basic Data From <%s>.' % symbol)
 
         try:
