@@ -1,4 +1,5 @@
 import scrapy, json
+from scrapy.http import Request
 from utils.webpage import log_empty_fields, get_url_param
 from utils.exporter import read_cache
 from utils.hmacsha1 import get_unix_time, get_access_signature
@@ -43,8 +44,9 @@ class JibenSpider(scrapy.Spider):
             for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
                 body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'date': date}
                 if self.is_json:
-                    body = json.dumps(body)
-                yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
+                    yield Request(self.start_formated_url, body=json.dumps(body), method='POST')
+                else:
+                    yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
             if self.method:
                 for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
@@ -53,8 +55,9 @@ class JibenSpider(scrapy.Spider):
                 for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
                     body = {'date': date}
                     if self.is_json:
-                        body = json.dumps(body)
-                    yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
+                        yield Request(self.start_formated_url, body=json.dumps(body), method='POST')
+                    else:
+                        yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):
         if self.method:

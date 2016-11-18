@@ -1,7 +1,9 @@
 import scrapy, json, time
+from scrapy.http import Request
 from utils.webpage import get_url_host
 from utils.hmacsha1 import get_unix_time, get_login_signature
 from exporterHelper.items import ExporterItem
+
 
 ############################################################################################
 #                                                                                          #
@@ -35,9 +37,9 @@ class AIFPlatLoginSpider(scrapy.Spider):
             else:
                 body = {'username':self.username, 'timestamp':timestamp, 'signature':signature}
             if self.is_json:
-                body = json.dumps(body)
-
-            yield scrapy.FormRequest(self.login_url, formdata=body)
+                yield Request(self.login_url, body=json.dumps(body), method='POST')
+            else:
+                yield scrapy.FormRequest(self.login_url, formdata=body)
 
     def parse(self, response):
         symbol = (self.plat_id, get_url_host(response.url), response.url)

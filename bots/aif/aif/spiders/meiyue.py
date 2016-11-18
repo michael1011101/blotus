@@ -1,4 +1,5 @@
 import scrapy, json
+from scrapy.http import Request
 from utils.webpage import log_empty_fields, get_url_param
 from utils.exporter import read_cache
 from utils.hmacsha1 import get_unix_time, get_access_signature
@@ -32,16 +33,18 @@ class MeiyueSpider(scrapy.Spider):
             signature = get_access_signature(token, timestamp, self.password)
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'month': self.month}
             if self.is_json:
-                body = json.dumps(body)
-            yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
+                yield Request(self.start_formated_url, body=json.dumps(body), method='POST')
+            else:
+                yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
             if self.method:
                 yield scrapy.FormRequest(self.start_formated_url.format(month=self.month), method='GET', dont_filter=True)
             else:
                 body = {'month':self.month}
                 if self.is_json:
-                    body = json.dumps(body)
-                yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
+                    yield Request(self.start_formated_url, body=json.dumps(body), method='POST')
+                else:
+                    yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):
         #symbol = (self.plat_id, get_url_param(response.url, 'from_month'), get_url_param(response.url, 'to_month'), response.url)
