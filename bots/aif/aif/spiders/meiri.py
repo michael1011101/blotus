@@ -19,7 +19,7 @@ class MeiriSpider(scrapy.Spider):
     formated_parameters = '?page_size={page_size}&page_index={page_index}&from_date={from_date}&to_date={to_date}'
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20160927', to_date='20160928', page_size=20, page_index=1, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20160927', to_date='20160928', page_size=20, page_index=1, is_json=None, *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
@@ -29,6 +29,7 @@ class MeiriSpider(scrapy.Spider):
         self.to_date = encode_date(decode_date(to_date), '-')
         self.page_size = str(page_size)
         self.page_index = str(page_index)
+        self.is_json = is_json
 
         super(MeiriSpider, self).__init__(*args, **kwargs)
 
@@ -43,6 +44,8 @@ class MeiriSpider(scrapy.Spider):
             signature = get_access_signature(token, timestamp, self.password)
 
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'from_date': self.from_date, 'to_date': self.to_date, 'page_size': self.page_size, 'page_index': self.page_index}
+            if self.is_json:
+                body = json.dumps(body)
 
             yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
@@ -50,6 +53,8 @@ class MeiriSpider(scrapy.Spider):
                 yield scrapy.FormRequest(self.start_formated_url+self.formated_parameters.format(page_size=self.page_size, page_index=self.page_index, from_date=self.from_date, to_date=self.to_date), method='GET', dont_filter=True)
             else:
                 body = {'from_date': self.from_date,'to_date': self.to_date, 'page_size': self.page_size, 'page_index': self.page_index}
+                if self.is_json:
+                    body = json.dumps(body)
                 yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):

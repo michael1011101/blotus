@@ -10,13 +10,14 @@ class MeiyueSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month='201609', *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month='201609', is_json=None, *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
         self.start_formated_url = formated_url
         self.password = password
         self.month = '-'.join(map('{:0>2}'.format, map(int, (month[:4], month[4:6]))))
+        self.is_json = is_json
 
         super(MeiyueSpider, self).__init__(*args, **kwargs)
 
@@ -30,13 +31,16 @@ class MeiyueSpider(scrapy.Spider):
             timestamp = get_unix_time()
             signature = get_access_signature(token, timestamp, self.password)
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'month': self.month}
-
+            if self.is_json:
+                body = json.dumps(body)
             yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
         else:
             if self.method:
                 yield scrapy.FormRequest(self.start_formated_url.format(month=self.month), method='GET', dont_filter=True)
             else:
                 body = {'month':self.month}
+                if self.is_json:
+                    body = json.dumps(body)
                 yield scrapy.FormRequest(self.start_formated_url, formdata=body, dont_filter=True)
 
     def parse(self, response):

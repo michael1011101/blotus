@@ -17,12 +17,13 @@ class AIFPlatLoginSpider(scrapy.Spider):
     token_field = 'plat_id'
     pipeline = ['TokenFileExporterPersistencePipeline']
 
-    def __init__(self, plat_id=None, login_url=None, username=None, password=None, secret_key=None, *args, **kwargs):
+    def __init__(self, plat_id=None, login_url=None, username=None, password=None, secret_key=None, is_json=None, *args, **kwargs):
         self.plat_id = plat_id
         self.login_url = login_url
         self.username = username
         self.password = password
         self.secret_key = secret_key
+        self.is_json = is_json
         super(AIFPlatLoginSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
@@ -33,6 +34,8 @@ class AIFPlatLoginSpider(scrapy.Spider):
                 body = {'username':self.username, 'password':self.password, 'timestamp':timestamp, 'signature':signature.upper()}
             else:
                 body = {'username':self.username, 'timestamp':timestamp, 'signature':signature}
+            if self.is_json:
+                body = json.dumps(body)
 
             yield scrapy.FormRequest(self.login_url, formdata=body)
 
