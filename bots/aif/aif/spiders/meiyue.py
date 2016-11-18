@@ -11,7 +11,7 @@ class MeiyueSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month='201609', is_json=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, month='201609', is_json=None, is_upper=None, *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
@@ -19,6 +19,7 @@ class MeiyueSpider(scrapy.Spider):
         self.password = password
         self.month = '-'.join(map('{:0>2}'.format, map(int, (month[:4], month[4:6]))))
         self.is_json = is_json
+        self.is_upper = is_upper
 
         super(MeiyueSpider, self).__init__(*args, **kwargs)
 
@@ -30,7 +31,7 @@ class MeiyueSpider(scrapy.Spider):
                 token = lines[0]
 
             timestamp = get_unix_time()
-            signature = get_access_signature(token, timestamp, self.password)
+            signature = get_access_signature(token, timestamp, self.password, self.is_upper)
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'month': self.month}
             if self.is_json:
                 yield Request(self.start_formated_url, body=json.dumps(body), method='POST')

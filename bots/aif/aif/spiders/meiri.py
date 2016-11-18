@@ -20,7 +20,7 @@ class MeiriSpider(scrapy.Spider):
     formated_parameters = '?page_size={page_size}&page_index={page_index}&from_date={from_date}&to_date={to_date}'
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20160927', to_date='20160928', page_size=20, page_index=1, is_json=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20160927', to_date='20160928', page_size=20, page_index=1, is_json=None, is_upper=None, *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
@@ -31,6 +31,7 @@ class MeiriSpider(scrapy.Spider):
         self.page_size = str(page_size)
         self.page_index = str(page_index)
         self.is_json = is_json
+        self.is_upper = is_upper
 
         super(MeiriSpider, self).__init__(*args, **kwargs)
 
@@ -42,7 +43,7 @@ class MeiriSpider(scrapy.Spider):
             if self.need_token and lines: token = lines[0]
 
             timestamp = get_unix_time()
-            signature = get_access_signature(token, timestamp, self.password)
+            signature = get_access_signature(token, timestamp, self.password, self.is_upper)
 
             body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'from_date': self.from_date, 'to_date': self.to_date, 'page_size': self.page_size, 'page_index': self.page_index}
             if self.is_json:

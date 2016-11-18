@@ -19,19 +19,20 @@ class AIFPlatLoginSpider(scrapy.Spider):
     token_field = 'plat_id'
     pipeline = ['TokenFileExporterPersistencePipeline']
 
-    def __init__(self, plat_id=None, login_url=None, username=None, password=None, secret_key=None, is_json=None, *args, **kwargs):
+    def __init__(self, plat_id=None, login_url=None, username=None, password=None, secret_key=None, is_json=None, is_upper=None, *args, **kwargs):
         self.plat_id = plat_id
         self.login_url = login_url
         self.username = username
         self.password = password
         self.secret_key = secret_key
         self.is_json = is_json
+        self.is_upper = is_upper
         super(AIFPlatLoginSpider, self).__init__(*args, **kwargs)
 
     def start_requests(self):
         if self.login_url:
             timestamp = get_unix_time()
-            signature = get_login_signature(self.username, self.password, timestamp, self.secret_key)
+            signature = get_login_signature(self.username, self.password, timestamp, self.secret_key, self.is_upper)
             if self.secret_key:
                 body = {'username':self.username, 'password':self.password, 'timestamp':timestamp, 'signature':signature.upper()}
             else:

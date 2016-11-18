@@ -20,7 +20,7 @@ class JibenSpider(scrapy.Spider):
     start_formated_url = None
     pipeline = ['UniqueItemPersistencePipeline']
 
-    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20161008', to_date='20161008', is_json=None, *args, **kwargs):
+    def __init__(self, plat_id=None, method='0', need_token='0', formated_url='', password=None, from_date='20161008', to_date='20161008', is_json=None, is_upper=None, *args, **kwargs):
         self.plat_id = plat_id
         self.method = bool(int(method))
         self.need_token = bool(int(need_token))
@@ -28,6 +28,7 @@ class JibenSpider(scrapy.Spider):
         self.password = password
         self.from_date, self.to_date = from_date, to_date
         self.is_json = is_json
+        self.is_upper = is_upper
 
         super(JibenSpider, self).__init__(*args, **kwargs)
 
@@ -39,7 +40,7 @@ class JibenSpider(scrapy.Spider):
             if self.need_token and lines: token = lines[0]
 
             timestamp = get_unix_time()
-            signature = get_access_signature(token, timestamp, self.password)
+            signature = get_access_signature(token, timestamp, self.password, self.is_upper)
 
             for date in get_date_list(from_date=self.from_date, to_date=self.to_date, delimiter='-'):
                 body = {'token': token, 'timestamp': timestamp, 'signature': signature, 'date': date}
