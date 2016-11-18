@@ -15,7 +15,7 @@ def get_login_signature(username, password, timestamp, secret_key=None, is_upper
             return hmac.new(secret_key, msg, sha1).digest().encode('hex')
     else:
         if is_upper:
-            return hmac.new(secret_key, msg, sha1).digest().encode('hex').upper()
+            return hmac.new(password, msg, sha1).digest().encode('hex').upper()
         else:
             return hmac.new(password, msg, sha1).digest().encode('hex')
 
