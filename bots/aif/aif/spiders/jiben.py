@@ -73,7 +73,10 @@ class JibenSpider(scrapy.Spider):
         try:
             content = json.loads(response.body_as_unicode())
             self.logger.info(content)
-            internal_content = content.get('data', {})[0]
+            if isinstance(content.get('data', {}), list):
+                internal_content = content.get('data', {})[0]
+            else:
+                internal_content = content.get('data', {})
             if int(content.get('result_code', -1)) != 1 or not internal_content:
                 raise ValueError
         except Exception:
