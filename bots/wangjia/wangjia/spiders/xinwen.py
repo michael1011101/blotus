@@ -68,17 +68,19 @@ class XinwenSpider(scrapy.Spider):
         item['category_id'] = tc[1]
         item['source'] = symbol[2]
 
-        article = response.xpath('//div[@class="con_news"]')
+        article = response.xpath('//div[@class="show-box"]')
         item['title'] = get_content(article.xpath('h1/text()').extract())
 
-        subtitle = article.xpath('ul/li[@class="n_time"]/text()').extract()[0].encode('utf8').split('：')
-        item['created'] = get_content(subtitle[1].split())
-        item['author'] = get_content(subtitle[-1].split())
-        item['summary'] = get_content(article.xpath('ul/li[@class="a_abstract"]/span/text()').extract())
+        subtitle = article.xpath('div[@class="s-bq"]/span')
+        item['created'] = subtitle[0].xpath('text()').extract()[0]
+        if len(subtitle) >= 3:
+            item['author'] = get_content(subtitle[2].xpath('text()').extract()).split(u'：')[1]
+        item['summary'] = get_content(article.xpath('div[@class="s-zy"]/span/text()').extract())
 
-        body = article.xpath('ul/li[@class="news_con_p"]')
+        body = article.xpath('div[@class="c-cen"]')
         item['content'] = ''.join([get_trunk(c) for c in body.xpath('.//text()').extract()])
         item['raw_content'] = get_content(body.extract())
         item['image_url'] = '#'.join([self.modify_image_url(get_trunk(c)) for c in body.xpath('.//img/@src').extract()]) or None
 
-        return item
+        self.logger.info(item)
+        return None

@@ -20,7 +20,7 @@ class WangjiaNewsJsonSpider(scrapy.Spider):
     #NOTE: (zacky, 2016.JUN.7th) JUST MARK UP BLACK TAB HERE.
     black_tab = ['fangtan', 'zhuanlan', 'video']
 
-    def __init__(self, from_id=1, to_id=1, category=0, *args, **kwargs):
+    def __init__(self, from_id=1, to_id=1, category=1, *args, **kwargs):
         to_id = max(int(from_id), int(to_id))
         self.shortlist = xrange(int(from_id), int(to_id)+1)
         self.max_thread = get_max_thread_from_news(category)
@@ -36,9 +36,9 @@ class WangjiaNewsJsonSpider(scrapy.Spider):
         self.logger.info('Parsing Wangjia News %s URLs From <%s>.' % (self.category, response.url))
 
         item = ExporterItem()
-        elements = response.xpath('//div[contains(@class, "specialBox")]//div[@class="news_title"]')
+        elements = response.xpath('//ul[@class="zllist"]/li')
         for ele in elements:
-            url = get_content(ele.xpath('a/@href').extract())
+            url = get_content(ele.xpath('div[2]/h3/a/@href').extract())
             if url.find(self.category) == -1: continue
 
             thread = get_thread_from_news_url(url)
