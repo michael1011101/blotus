@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from lolly import Lolly
 
@@ -92,17 +91,6 @@ class Problem(Lolly):
 
 
 class Rating(Lolly):
-    # name          平台名称
-    # timestamp     评级时间（年月）
-    # exponent      发展指数
-    # launch_time   上线时间
-    # location      所在城市
-    # deal          成交
-    # popularity    人气
-    # lever         杠杆
-    # dispersity    分散度
-    # mobility      流动性
-    # transparency  透明度
     name = models.CharField(max_length=50)
     timestamp = models.CharField(max_length=10)
     exponent = models.DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -110,7 +98,10 @@ class Rating(Lolly):
     location = models.CharField(max_length=20, null=True)
     deal = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     popularity = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    profit = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    revenue = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     lever = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    brand = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     dispersity = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     mobility = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     transparency = models.DecimalField(max_digits=5, decimal_places=2, null=True)
