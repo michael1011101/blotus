@@ -36,7 +36,7 @@ class WentiItem(BaseItem):
 class PingjiItem(BaseItem):
     django_model = wangjia.Rating
     update_fields_list = ['name', 'timestamp', 'exponent', 'launch_time', 'location', 'deal', 'popularity',  \
-                          'profit', 'revenue', 'lever', 'brand', 'dispersity','mobility','transparency']
+                          'lever', 'dispersity','mobility','transparency']
     unique_key = ('name', 'timestamp')
 
 class ShujuItem(BaseItem):
